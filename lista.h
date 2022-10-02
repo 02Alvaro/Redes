@@ -4,10 +4,10 @@
     #include "estructuras.h"
 
     Lista *nuevoElemento();
-    void insertarDetras(Lista **cabeza, Lista* elemento);
-    void insertarDelante(Lista **cabeza, Lista * elemento);
-    void borrar(Lista **cabeza, Lista * elemento);
+    void insertarDetras(Lista **cabeza, Jugador* jugador);
+    void insertarDelante(Lista **cabeza, Jugador * jugador);
+    void borrar(Lista **cabeza, Jugador * jugador);
     int Nregistros(Lista *cabeza);
-    Lista * buscarJugador(Lista **cabeza, int sd);
+    Jugador * buscarJugador(Lista **cabeza, int sd);
 
 #endif

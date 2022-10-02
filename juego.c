@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "juego.h"
+#include "estructuras.h"
 
 void mostrarTablero(char tablero[][7],char * msg){
     strcpy(msg,"");
@@ -18,6 +19,25 @@ void mostrarTablero(char tablero[][7],char * msg){
 		}
         strcat(msg,"|\n");
 	}
+}
+
+void inicializarPartida(Jugador* j1, Jugador* j2){
+    Partida* partida=(Partida*)malloc(sizeof(Partida));
+    char tablero[7][7]={{'1','2','3','4','5','6','7'},
+                        {'-','-','-','-','-','-','-'},
+                        {'-','-','-','-','-','-','-'},
+                        {'-','-','-','-','-','-','-'},
+                        {'-','-','-','-','-','-','-'},
+                        {'-','-','-','-','-','-','-'},
+                        {'-','-','-','-','-','-','-'}};
+    strcpy(partida->tablero,tablero);
+    
+    partida->jugador2 = j2;
+    partida->jugador1 = j1;
+    partida->turno = 0;
+    
+    j1->partida=partida;
+    j2->partida=partida;
 }
 
 int actualizarTablero(char tablero[][7], int colum, int turno){
@@ -113,6 +133,10 @@ int finPartida(char tablero[][7],int turno,int fila,int columna){
     return 0;
 }
 
+
+
+
+/*
     int  main(){
         char tablero[7][7]={{'1','2','3','4','5','6','7'},
                             {'-','-','-','-','-','-','-'},
@@ -147,3 +171,4 @@ int finPartida(char tablero[][7],int turno,int fila,int columna){
         return 0;
 
     }
+*/

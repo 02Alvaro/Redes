@@ -6,7 +6,10 @@ Lista *nuevoElemento(){
     return ( Lista*)malloc(sizeof(Lista));
 }
 
-void insertarDetras(Lista **cabeza, Lista* elemento){
+void insertarDetras(Lista **cabeza, Jugador *jugador){
+    Lista *elemento = nuevoElemento();
+    elemento -> item = jugador;
+    
     Lista *aux  =  *cabeza;
     if( aux == NULL){
         *cabeza = elemento;
@@ -18,7 +21,9 @@ void insertarDetras(Lista **cabeza, Lista* elemento){
     aux->sig = elemento;
 }
 
-void insertarDelante(Lista **cabeza, Lista * elemento){
+void insertarDelante(Lista **cabeza, Jugador *jugador){
+    Lista *elemento = nuevoElemento();
+    elemento -> item = jugador;
     if(*cabeza == NULL){
         *cabeza = elemento;
         return;
@@ -27,17 +32,21 @@ void insertarDelante(Lista **cabeza, Lista * elemento){
     *cabeza = elemento;
 }
 
-void borrar(Lista **cabeza, Lista * elemento){
+void borrar(Lista **cabeza, Jugador *jugador){
     Lista *aux=*cabeza;
-    if(*cabeza == elemento){
-        *cabeza = elemento->sig;
+    if((*cabeza)->item == jugador){
+        *cabeza = (*cabeza)->sig;
         return;
     }
-    while(aux->sig != elemento){
+    while(aux->sig->item != jugador){
         aux=aux->sig;
     }
-    aux->sig = elemento->sig;
-    free(elemento);
+
+    //TODO comprobar que funciona
+    Lista *elementoABorrar=aux->sig;
+    aux->sig = aux->sig->sig;
+    free(jugador);
+    free(elementoABorrar);
 }
 
 int Nregistros(Lista *cabeza){
