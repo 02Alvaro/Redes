@@ -112,7 +112,7 @@ int finPartida(char tablero[][7],int turno,int fila,int columna){
   
     return 0;
 }
-/*
+
     int  main(){
         char tablero[7][7]={{'1','2','3','4','5','6','7'},
                             {'-','-','-','-','-','-','-'},
@@ -147,4 +147,3 @@ int finPartida(char tablero[][7],int turno,int fila,int columna){
         return 0;
 
     }
-*/
