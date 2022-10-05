@@ -31,13 +31,18 @@ void inicializarPartida(Jugador* j1, Jugador* j2){
                         {'-','-','-','-','-','-','-'},
                         {'-','-','-','-','-','-','-'}};
     strcpy(partida->tablero,tablero);
+
+    j1->estado = 4;
+    j1->partida=partida;
+    
+    j2->estado = 4;
+    j2->partida=partida;
     
     partida->jugador2 = j2;
     partida->jugador1 = j1;
     partida->turno = 0;
     
-    j1->partida=partida;
-    j2->partida=partida;
+
 }
 
 int actualizarTablero(char tablero[][7], int colum, int turno){

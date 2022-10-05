@@ -4,7 +4,6 @@
     typedef struct {
         int sd;
         char* nombre;
-        char* creden;
         int estado;
         /*
         estado = 0 usuario conectado no identificado (esperando USUARIO o REGISTRO)
