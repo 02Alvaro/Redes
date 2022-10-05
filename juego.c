@@ -5,23 +5,19 @@
 #include "estructuras.h"
 
 void mostrarTablero(char tablero[][7],char * msg){
-    strcpy(msg,"");
     char  aux;
 	for(int i = 0; i < 7; i++ ){
 		for(int j = 0; j < 7; j++ ){
-            if(tablero[i][j] == '-'){
-                aux = ' ';
-            }else{
-                aux = tablero[i][j];
-            }
-            strcat(msg,"|");
+            aux = tablero[i][j];
+            if (j != 0)
+                strcat(msg,",");
             strcat(msg,&aux);
 		}
-        strcat(msg,"|\n");
+        strcat(msg,";");
 	}
 }
 
-void inicializarPartida(Jugador* j1, Jugador* j2){
+void inicializarPartida(Jugador* j1, Jugador* j2, char* msg){
     Partida* partida=(Partida*)malloc(sizeof(Partida));
     char tablero[7][7]={{'1','2','3','4','5','6','7'},
                         {'-','-','-','-','-','-','-'},
@@ -38,6 +34,10 @@ void inicializarPartida(Jugador* j1, Jugador* j2){
     
     j1->partida=partida;
     j2->partida=partida;
+
+    strcpy(msg,"+Ok. Empieza la partida. ");
+    mostrarTablero(tablero, msg);
+
 }
 
 int actualizarTablero(char tablero[][7], int colum, int turno){

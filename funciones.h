@@ -5,4 +5,5 @@
 
     Jugador* nuevoJugador(int sd);
     int buscarUsuario(char * nombre);
+    
 #endif
