@@ -1,7 +1,11 @@
 #ifndef ESTRUCTURAS_H
 #define ESTRUCTURAS_H
 
-    typedef struct {
+    typedef struct jugador Jugador;
+    typedef struct partida Partida;
+    typedef struct lista Lista;
+
+    struct jugador {
         int sd;
         char* nombre;
         int estado;
@@ -13,18 +17,18 @@
         estado = 4 usuario en partida
         */
         Partida* partida;
-    } Jugador;
+    };
 
-    typedef struct {
+    struct partida {
         char tablero[7][7];
         Jugador* jugador1;
         Jugador* jugador2;
         int turno;
-    } Partida;
+    };
 
-    typedef  struct{
+    struct lista{
         Jugador* item;
         Lista* sig;
-    } Lista;
+    };
 
 #endif
