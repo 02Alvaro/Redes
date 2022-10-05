@@ -45,14 +45,8 @@ int actualizarTablero(char tablero[][7], int colum, int turno){
     if(colum >  6|| colum < 0)
 		return -1;
 
-    char ficha;
-    if(turno%2 == 0){
-        ficha = 'x';
-    }
-    else{
-        ficha = 'o';
-    }
-    
+    char ficha = (turno %2 == 0) ? 'x' : 'o';
+
 	for(int i = 6; i > 0; i--){
 		if(tablero[i][colum] == '-'){
             tablero[i][colum]=ficha;
@@ -66,13 +60,7 @@ int finPartida(char tablero[][7],int turno,int fila,int columna){
     if(turno == MAX_TURNO){
         return 1;
     }
-    char ficha;
-    if(turno %2 == 0){
-        ficha='x';
-    }
-    else{
-        ficha='o';
-    }
+    char ficha = (turno %2 == 0) ? 'x' : 'o';
     int x = fila, y = columna;
     int contador = 1;
 

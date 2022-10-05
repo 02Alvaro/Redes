@@ -10,10 +10,9 @@ Jugador * nuevoJugador(int sd){
     return aux;
 }
 
-void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista ** lista[]){
+void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista ** lista){
     int socket=jugador->sd;
     char buffer[250];
-    int j;
 
     if (jugador->estado == 4){
         Jugador* contrincante;
@@ -49,11 +48,39 @@ int buscarUsuario(char * usuario){
 	if((f=fopen("usuarios.txt","r"))==NULL)
         printf("Error en la opertura del fichero\n");
     while(fscanf(f, "%s %s", str1, str2)){
-        if(strcmp(str1,usuario)){
+        if(strcmp(str1,usuario)==0){
             fclose(f);    
             return 1;
         }
     }
     fclose(f);
     return 0;
+}
+
+int comprobarCont(char * nombre,char * psd){
+    FILE * f;
+    char * str1,str2;
+	if((f=fopen("usuarios.txt","r"))==NULL)
+        printf("Error en la opertura del fichero\n");
+    while(fscanf(f, "%s %s", str1, str2)){
+        if(strcmp(str1,nombre)==0){
+            if(strcmp(str2,psd)==0){
+                 fclose(f);  
+                return 1;
+            }else{
+                 fclose(f);  
+                return 0;
+            }
+        }
+    }
+    fclose(f);
+    return 0;
+}
+
+void ingresarUsuario(char * nombre,char* psd ){
+    FILE * f;
+	if((f=fopen("usuarios.txt","r"))==NULL)
+        printf("Error en la opertura del fichero\n"); 
+    
+    fprintf(f,"%s,%s",nombre,psd);
 }

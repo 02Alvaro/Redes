@@ -49,9 +49,9 @@ void borrar(Lista **cabeza, Jugador *jugador){
     free(elementoABorrar);
 }
 
-int Nregistros(Lista *cabeza){
+int Nregistros(Lista **cabeza){
     int contador = 0;
-    Lista *aux = cabeza;
+    Lista *aux = *cabeza;
     while(aux != NULL){
         aux = aux->sig;
         contador++;
@@ -60,9 +60,19 @@ int Nregistros(Lista *cabeza){
 } 
 
 Jugador * buscarJugador(Lista **cabeza, int sd){
-    Lista * aux;
+    Lista * aux=*cabeza;
     while(aux->sig != NULL){
         if(aux->item->sd == sd){
+            return aux->item;
+        }
+        aux=aux->sig;
+    }
+    return NULL;
+}
+Jugador * buscarJugadorPartida(Lista  ** cabeza){
+    Lista * aux=*cabeza;
+    while(aux->sig != NULL){
+        if(aux->item->estado == 3){
             return aux->item;
         }
         aux=aux->sig;

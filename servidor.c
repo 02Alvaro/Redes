@@ -19,7 +19,6 @@
 #define MAX_CLIENTS 50
 
 void manejador(int signum);
-void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]);
 
 
 int main ( )
@@ -119,7 +118,7 @@ int main ( )
                                 send((*listaJugadores)->item->sd, buffer, sizeof(buffer),0);
                                 close((*listaJugadores)->item->sd);
                                 FD_CLR((*listaJugadores)->item->sd,&readfds);
-                                borrar(listaJugadores,(*listaJugadores)->item->sd);
+                                borrar(listaJugadores,(*listaJugadores)->item);
                             }
                             close(sd);
                             exit(-1);
@@ -136,7 +135,7 @@ int main ( )
 
                             if(strcmp(buffer,"SALIR\n") == 0){
                                 //TODO
-                                salirCliente(i,&readfds,&numClientes,listaJugadores);
+                                salirCliente(buscarJugador(listaJugadores,i),&readfds,&numClientes,listaJugadores);
                             }
                             else{
                                 char* instruccion = strtok(buffer, " ");
@@ -158,7 +157,8 @@ int main ( )
                                         
                                     } else if (strcmp(instruccion, "REGISTRO") == 0){
                                         int correcto = 0,error = 0, contador = 0;
-                                        char* usuario, cont;
+                                        char* usuario;
+                                        char cont[MSG_SIZE];
                                         while(correcto == 0 && error == 0){
                                             char * lineaFichero;
                                             instruccion = strtok(NULL, " ");
@@ -282,7 +282,7 @@ int main ( )
 
                         if(recibidos== 0){
                             printf("El socket %d, ha introducido ctrl+c\n", i);
-                            salirCliente(i,&readfds,&numClientes,arrayClientes);
+                                salirCliente(buscarJugador(listaJugadores,i),&readfds,&numClientes,listaJugadores);
                         }
                     }
                 }
@@ -294,33 +294,6 @@ int main ( )
 	return 0;
 	
 }
-
-void salirCliente(int socket, fd_set * readfds, int * numClientes, int arrayClientes[]){
-  
-    char buffer[250];
-    int j;
-    
-    close(socket);
-    FD_CLR(socket,readfds);
-    
-    for (j = 0; j < (*numClientes) - 1; j++)
-        if (arrayClientes[j] == socket)
-            break;
-    for (; j < (*numClientes) - 1; j++)
-        (arrayClientes[j] = arrayClientes[j+1]);
-    
-    (*numClientes)--;
-    
-    bzero(buffer,sizeof(buffer));
-    sprintf(buffer,"Desconexión del cliente: %d\n",socket);
-    
-    for (j = 0; j<(*numClientes); j++)
-        if(arrayClientes[j] != socket)
-            send(arrayClientes[j],buffer,sizeof(buffer),0);
-
-
-}
-
 
 void manejador (int signum){
     printf("\nSe ha recibido la señal sigint\n");
