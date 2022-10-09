@@ -9,13 +9,14 @@
 #include "lista.h"
 
 Jugador * nuevoJugador(int sd){
-    Jugador* aux;
-    aux->sd=sd;
+    Jugador* aux = (Jugador *) malloc(sizeof(Jugador));
+    aux->nombre = (char*)malloc(sizeof(char)*20);
+    aux->sd = sd;
     aux->estado=0;
     return aux;
 }
 
-void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista ** lista){
+void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista * lista){
     int socket=jugador->sd;
     char buffer[250];
 
@@ -40,7 +41,7 @@ void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista 
     close(socket);
     FD_CLR(socket,readfds);
     (*numClientes)--;
-    borrar(lista,buscarJugador(lista,socket));
+    borrar(&lista, buscarJugador(lista, socket));
 
     bzero(buffer,sizeof(buffer));
     sprintf(buffer,"Desconexión del cliente: %d\n",socket);
@@ -55,7 +56,8 @@ int buscarUsuario(char * usuario){
 	if((f=fopen("usuarios.txt","r"))==NULL)
         printf("Error en la opertura del fichero\n");
 
-    while(fscanf(f, "%s,%s", str1, str2)){
+    while(fscanf(f,"%s,%s\n", str1, str2)>0){
+        printf("leido usuario:%s|contra:%s, comparado con:%s\n",str1,str2,usuario);
         if(strcmp(str1,usuario)==0){
             fclose(f);    
             return 1;
@@ -74,7 +76,8 @@ int comprobarCont(char * nombre,char * psd){
 	if((f=fopen("usuarios.txt","r"))==NULL)
         printf("Error en la opertura del fichero\n");
         
-    while(fscanf(f, "%s,%s", str1, str2)){
+    while(fscanf(f,"%s,%s\n", str1, str2)>0){
+        printf("leido usuario:%s|contra:%s, comparado con:%s\n",str1,str2,psd);
         if(strcmp(str1,nombre)==0){
             if(strcmp(str2,psd)==0){
                  fclose(f);  

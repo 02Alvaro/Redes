@@ -6,7 +6,7 @@
 
     Jugador* nuevoJugador(int sd);
     int buscarUsuario(char * nombre);
-    void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista ** lista);
+    void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista * lista);
     void ingresarUsuario(char * nombre,char* psd );
     int comprobarCont(char * nombre,char * psd);
 

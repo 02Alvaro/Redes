@@ -1,5 +1,6 @@
 #include"lista.h"
 #include "estructuras.h"
+#include <stdio.h>
 #include <stdlib.h>   
 
 Lista *nuevoElemento(){
@@ -9,7 +10,6 @@ Lista *nuevoElemento(){
 void insertarDetras(Lista **cabeza, Jugador *jugador){
     Lista *elemento = nuevoElemento();
     elemento -> item = jugador;
-    
     Lista *aux  =  *cabeza;
     if( aux == NULL){
         *cabeza = elemento;
@@ -24,10 +24,6 @@ void insertarDetras(Lista **cabeza, Jugador *jugador){
 void insertarDelante(Lista **cabeza, Jugador *jugador){
     Lista *elemento = nuevoElemento();
     elemento -> item = jugador;
-    if(*cabeza == NULL){
-        *cabeza = elemento;
-        return;
-    }
     elemento->sig = *cabeza;
     *cabeza = elemento;
 }
@@ -49,9 +45,9 @@ void borrar(Lista **cabeza, Jugador *jugador){
     free(elementoABorrar);
 }
 
-int Nregistros(Lista **cabeza){
+int Nregistros(Lista *cabeza){
     int contador = 0;
-    Lista *aux = *cabeza;
+    Lista *aux = cabeza;
     while(aux != NULL){
         aux = aux->sig;
         contador++;
@@ -59,9 +55,9 @@ int Nregistros(Lista **cabeza){
     return contador;
 } 
 
-Jugador * buscarJugador(Lista **cabeza, int sd){
-    Lista * aux=*cabeza;
-    while(aux->sig != NULL){
+Jugador * buscarJugador(Lista *cabeza, int sd){
+    Lista * aux=cabeza;
+    while(aux != NULL){
         if(aux->item->sd == sd){
             return aux->item;
         }
@@ -69,9 +65,9 @@ Jugador * buscarJugador(Lista **cabeza, int sd){
     }
     return NULL;
 }
-Jugador * buscarJugadorPartida(Lista  ** cabeza){
-    Lista * aux=*cabeza;
-    while(aux->sig != NULL){
+Jugador * buscarJugadorPartida(Lista  * cabeza){
+    Lista * aux=cabeza;
+    while(aux != NULL){
         if(aux->item->estado == 3){
             return aux->item;
         }

@@ -37,7 +37,7 @@ int main ( )
     int recibidos;
     
     //int arrayClientes[MAX_CLIENTS];
-    Lista **listaJugadores;
+    Lista *listaJugadores = NULL;
 
   	sd = socket (AF_INET, SOCK_STREAM, 0);
 	if (sd == -1)
@@ -75,7 +75,7 @@ int main ( )
     FD_SET(sd,&readfds);
     FD_SET(0,&readfds);
 
-    signal(SIGINT,manejador);
+   // signal(SIGINT,manejador);
     
     while(1){        
         auxfds = readfds;
@@ -92,7 +92,7 @@ int main ( )
                         {
                             if(numClientes < MAX_CLIENTS){
                                 Jugador* jugador = nuevoJugador(new_sd);
-                                insertarDetras(listaJugadores, jugador);
+                                insertarDetras(&listaJugadores, jugador);
                                 numClientes++;
                                 FD_SET(new_sd,&readfds);
                             
@@ -115,10 +115,10 @@ int main ( )
                             for (int j = 0; j < numClientes; j++){
                                 bzero(buffer, sizeof(buffer));
                                 strcpy(buffer,"Desconexión servidor\n"); 
-                                send((*listaJugadores)->item->sd, buffer, sizeof(buffer),0);
-                                close((*listaJugadores)->item->sd);
-                                FD_CLR((*listaJugadores)->item->sd,&readfds);
-                                borrar(listaJugadores,(*listaJugadores)->item);
+                                send(listaJugadores->item->sd, buffer, sizeof(buffer),0);
+                                close(listaJugadores->item->sd);
+                                FD_CLR(listaJugadores->item->sd,&readfds);
+                                borrar(&listaJugadores,listaJugadores->item);
                             }
                             close(sd);
                             exit(-1);
@@ -132,19 +132,25 @@ int main ( )
                         if(recibidos > 0){
                             Jugador * jugadorActual = buscarJugador(listaJugadores,i);
                             int estadoJugador = jugadorActual->estado;
+                            printf("estado jugador<%d>->%d: mensaje:%s\n",i,estadoJugador,buffer);
 
                             if(strcmp(buffer,"SALIR\n") == 0){
                                 //TODO
-                                salirCliente(buscarJugador(listaJugadores,i),&readfds,&numClientes,listaJugadores);
+                                printf("jugador<%d> saliendo",i);
+                                salirCliente(jugadorActual,&readfds,&numClientes,listaJugadores);
                             }
                             else{
                                 char* instruccion = strtok(buffer, " ");
+                                printf("Instruccion leida:%s\n",instruccion);
                                 if(estadoJugador == 0){
                                     if (strcmp(instruccion, "USUARIO") == 0){
                                         instruccion= strtok(NULL, " ");
+                                        if(instruccion[strlen(instruccion)-1] == '\n')
+                                            instruccion[strlen(instruccion)-1] ='\0';
                                         //TODO
-                                        if(buscarUsuario(instruccion) == 0){
+                                        if(buscarUsuario(instruccion) == 1){
                                             jugadorActual->estado = 1;
+                                            printf("leido:%s\n",instruccion);
                                             strcpy(jugadorActual->nombre, instruccion);
                                             
                                             bzero(buffer,sizeof(buffer));
@@ -154,6 +160,7 @@ int main ( )
                                             bzero(buffer,sizeof(buffer));
                                             strcpy(buffer,"-Err. Usuario incorrecto\n");
                                         }
+                                        printf("entrando al USUARIO\n");
                                         
                                     } else if (strcmp(instruccion, "REGISTRO") == 0){
                                         int correcto = 0,error = 0, contador = 0;
@@ -162,6 +169,8 @@ int main ( )
                                         while(correcto == 0 && error == 0){
                                             char * lineaFichero;
                                             instruccion = strtok(NULL, " ");
+                                            if(instruccion[strlen(instruccion)-1] == '\n')
+                                                instruccion[strlen(instruccion)-1] ='\0';
                                             if(contador == 0 && strcmp(instruccion,"-u") == 0){
 
                                             } else if (contador == 1){
@@ -177,7 +186,7 @@ int main ( )
                                         }
 
                                         //TODO
-                                        if (buscarUsuario(usuario) == 0){
+                                        if (buscarUsuario(usuario) == 1){
                                             bzero(buffer,sizeof(buffer));
                                             strcpy(buffer,"-Err. Usuario ya creado\n");
 
@@ -193,13 +202,16 @@ int main ( )
                                         bzero(buffer,sizeof(buffer));
                                         strcpy(buffer,"-Err. Instrucción no válida\n");
                                     }
-
+                                    printf("<%d>:%s:",i,buffer);
                                     send(i, buffer, sizeof(buffer), 0);
 
                                 }else if(estadoJugador == 1){
                                     if (strcmp(instruccion, "PASSWORD") == 0){
                                         //TODO
-                                        if( comprobarCont(jugadorActual->nombre, strtok(NULL, "\n")) ){
+                                        instruccion =  strtok(NULL, "\n");
+                                        if(instruccion[strlen(instruccion)-1] == '\n')
+                                            instruccion[strlen(instruccion)-1] ='\0';
+                                        if( comprobarCont(jugadorActual->nombre,instruccion) == 1 ){
                                             jugadorActual->estado = 2;
                                             bzero(buffer,sizeof(buffer));
                                             strcpy(buffer,"+Ok. Usuario validado\n");
