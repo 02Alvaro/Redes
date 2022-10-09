@@ -32,6 +32,7 @@ void borrar(Lista **cabeza, Jugador *jugador){
     Lista *aux=*cabeza;
     if((*cabeza)->item == jugador){
         *cabeza = (*cabeza)->sig;
+        free(jugador);
         return;
     }
     while(aux->sig->item != jugador){

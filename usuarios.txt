@@ -1,2 +1,4 @@
 alvaro,alvaro
 mario,mario
+pepe,pepe
+manu,manu

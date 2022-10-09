@@ -164,13 +164,11 @@ int main ( )
                                         
                                     } else if (strcmp(instruccion, "REGISTRO") == 0){
                                         int correcto = 0,error = 0, contador = 0;
-                                        char* usuario;
+                                        char usuario[250];
                                         char cont[MSG_SIZE];
                                         while(correcto == 0 && error == 0){
                                             char * lineaFichero;
                                             instruccion = strtok(NULL, " ");
-                                            if(instruccion[strlen(instruccion)-1] == '\n')
-                                                instruccion[strlen(instruccion)-1] ='\0';
                                             if(contador == 0 && strcmp(instruccion,"-u") == 0){
 
                                             } else if (contador == 1){

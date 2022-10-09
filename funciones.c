@@ -36,13 +36,12 @@ void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista 
         free(contrincante->partida);
         contrincante->partida = NULL;
     }
-
-
+    printf("he llegado aqui");
+    borrar(&lista, buscarJugador(lista, socket));
+    printf("he llegado aqui2");
     close(socket);
     FD_CLR(socket,readfds);
     (*numClientes)--;
-    borrar(&lista, buscarJugador(lista, socket));
-
     bzero(buffer,sizeof(buffer));
     sprintf(buffer,"Desconexión del cliente: %d\n",socket);
     
@@ -96,6 +95,7 @@ void ingresarUsuario(char * nombre,char* psd ){
     FILE * f;
 	if((f=fopen("usuarios.txt","a"))==NULL)
         printf("Error en la opertura del fichero\n"); 
-    fprintf(f,"%s,%s\n",nombre,psd);
+    
+    fprintf(f,"%s,%s",nombre,psd);
     fclose(f);
 }
