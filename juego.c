@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "juego.h"
 #include "estructuras.h"
 
@@ -26,7 +27,12 @@ void inicializarPartida(Jugador* j1, Jugador* j2, char* msg){
                         {'-','-','-','-','-','-','-'},
                         {'-','-','-','-','-','-','-'},
                         {'-','-','-','-','-','-','-'}};
-    strcpy(partida->tablero,tablero);
+    
+    for(int i = 0; i < 7; i++ ){
+		for(int j = 0; j < 7; j++ ){
+            partida->tablero[i][j] = tablero[i][j];
+		}
+	}
 
     j1->estado = 4;
     j1->partida=partida;

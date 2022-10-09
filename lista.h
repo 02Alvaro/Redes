@@ -7,7 +7,7 @@
     void insertarDetras(Lista **cabeza, Jugador* jugador);
     void insertarDelante(Lista **cabeza, Jugador * jugador);
     void borrar(Lista **cabeza, Jugador * jugador);
-    int Nregistros(Lista *cabeza);
+    int Nregistros(Lista **cabeza);
     Jugador * buscarJugador(Lista **cabeza, int sd);
     Jugador * buscarJugadorPartida(Lista  ** lista);
 #endif

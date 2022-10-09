@@ -1,7 +1,12 @@
-#include "estructuras.h"
-#include "funciones.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+#include "estructuras.h"
+#include "funciones.h"
+#include "lista.h"
 
 Jugador * nuevoJugador(int sd){
     Jugador* aux;
@@ -44,25 +49,32 @@ void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista 
 
 int buscarUsuario(char * usuario){
     FILE * f;
-    char * str1,str2;
+    char* str1;
+    char* str2;
+
 	if((f=fopen("usuarios.txt","r"))==NULL)
         printf("Error en la opertura del fichero\n");
-    while(fscanf(f, "%s %s", str1, str2)){
+
+    while(fscanf(f, "%s,%s", str1, str2)){
         if(strcmp(str1,usuario)==0){
             fclose(f);    
             return 1;
         }
     }
+
     fclose(f);
     return 0;
 }
 
 int comprobarCont(char * nombre,char * psd){
     FILE * f;
-    char * str1,str2;
+    char * str1;
+    char * str2;
+
 	if((f=fopen("usuarios.txt","r"))==NULL)
         printf("Error en la opertura del fichero\n");
-    while(fscanf(f, "%s %s", str1, str2)){
+        
+    while(fscanf(f, "%s,%s", str1, str2)){
         if(strcmp(str1,nombre)==0){
             if(strcmp(str2,psd)==0){
                  fclose(f);  
