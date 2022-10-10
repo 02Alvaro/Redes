@@ -147,7 +147,6 @@ int main ( )
                                         instruccion= strtok(NULL, " ");
                                         if(instruccion[strlen(instruccion)-1] == '\n')
                                             instruccion[strlen(instruccion)-1] ='\0';
-                                        //TODO
                                         if(buscarUsuario(instruccion) == 1){
                                             jugadorActual->estado = 1;
                                             printf("leido:%s\n",instruccion);
@@ -256,9 +255,24 @@ int main ( )
                                     Jugador* contrincante;
                                     contrincante = (partida->turno % 2 == 0) 
                                         ? partida->jugador1 : partida->jugador2;
-
+                                    if(instruccion[strlen(instruccion)-1] == '\n')
+                                            instruccion[strlen(instruccion)-1] ='\0';
                                     if (strcmp(instruccion, "COLOCAR-FICHA") == 0){
+                                            instruccion = strtok(NULL,"\n");
+                                            if(instruccion[strlen(instruccion)-1] == '\n')
+                                                instruccion[strlen(instruccion)-1] ='\0';
+                                            
+                                            int colum=strtol(instruccion,NULL,10);
+                                            int res = actualizarTablero(partida->tablero,colum,partida->turno);
+                                            if(res > 0){
 
+                                            }
+                                            else if(res == -1 ){
+
+                                            }
+                                            else if(res == -2)
+                                            partida->turno=partida->turno+1;
+                                            
                                     } else {
                                         bzero(buffer,sizeof(buffer));
                                         strcpy(buffer,"-Err. Instrucción no válida\n");
