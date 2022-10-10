@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 
 
+
 int main ( )
 {
   
@@ -76,7 +77,16 @@ int main ( )
             
             bzero(buffer,sizeof(buffer));
             recv(sd,buffer,sizeof(buffer),0);
-            
+					for(int i=0;i<sizeof(buffer);i++){
+						if(buffer[i]==','){
+							buffer[i]='|';
+
+						}
+						else if(buffer[i]==';'){
+							buffer[i]='\n';
+						}
+					}
+				
             printf("\n%s\n",buffer);
             
             if(strcmp(buffer,"Demasiados clientes conectados\n") == 0)

@@ -33,7 +33,7 @@ void inicializarPartida(Jugador* j1, Jugador* j2, char* msg){
             partida->tablero[i][j] = tablero[i][j];
 		}
 	}
-
+    mostrarTablero(partida->tablero,msg);
     j1->estado = 4;
     j1->partida=partida;
     

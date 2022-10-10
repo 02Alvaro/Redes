@@ -255,9 +255,16 @@ int main ( )
                                     Jugador* contrincante;
                                     contrincante = (partida->turno % 2 == 0) 
                                         ? partida->jugador1 : partida->jugador2;
+                                  
+
                                     if(instruccion[strlen(instruccion)-1] == '\n')
                                             instruccion[strlen(instruccion)-1] ='\0';
                                     if (strcmp(instruccion, "COLOCAR-FICHA") == 0){
+                                      if(jugadorActual->sd != contrincante->sd){
+                                        bzero(buffer,sizeof(buffer));
+                                        strcpy(buffer,"-Err. No es tu turno\n");
+                                        send(i, buffer, sizeof(buffer), 0);
+                                        }else{
                                             instruccion = strtok(NULL,"\n");
                                             if(instruccion[strlen(instruccion)-1] == '\n')
                                                 instruccion[strlen(instruccion)-1] ='\0';
@@ -265,13 +272,34 @@ int main ( )
                                             int colum=strtol(instruccion,NULL,10);
                                             int res = actualizarTablero(partida->tablero,colum,partida->turno);
                                             if(res > 0){
+                                                    partida->turno=partida->turno+1;
+                                                     bzero(buffer,sizeof(buffer));
+                                                    strcpy(buffer,"-ok,ficha colocada\n");
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    strcpy(buffer,"-tu turno\n");
+                                                    send(contrincante->sd,buffer,sizeof(buffer),0);
+                                                    mostrarTablero(partida->tablero,buffer);
+                                                    send(contrincante->sd,buffer,sizeof(buffer),0);
+                                                    if(finPartida(partida->tablero,partida->turno,res,colum)==1){
+
+                                                         bzero(buffer,sizeof(buffer));
+                                                    strcpy(buffer,"GANADOR jugador\n");
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                    send(contrincante->sd,buffer,sizeof(buffer),0);
+                                                    }
 
                                             }
                                             else if(res == -1 ){
-
+                                                bzero(buffer,sizeof(buffer));
+                                                strcpy(buffer,"-Err. ficha fuera de limite\n");
+                                             send(i, buffer, sizeof(buffer), 0);
                                             }
-                                            else if(res == -2)
-                                            partida->turno=partida->turno+1;
+                                            else if(res == -2){
+                                                bzero(buffer,sizeof(buffer));
+                                                strcpy(buffer,"-Err. No cabe en esta columa\n");
+                                                send(i, buffer, sizeof(buffer), 0);
+                                            }
+                                        }
                                             
                                     } else {
                                         bzero(buffer,sizeof(buffer));
