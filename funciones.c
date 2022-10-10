@@ -16,7 +16,7 @@ Jugador * nuevoJugador(int sd){
     return aux;
 }
 
-void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista * lista){
+void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista ** lista){
     int socket=jugador->sd;
     char buffer[250];
 
@@ -36,9 +36,7 @@ void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista 
         free(contrincante->partida);
         contrincante->partida = NULL;
     }
-    printf("he llegado aqui");
-    borrar(&lista, buscarJugador(lista, socket));
-    printf("he llegado aqui2");
+    borrar(lista,socket);
     close(socket);
     FD_CLR(socket,readfds);
     (*numClientes)--;

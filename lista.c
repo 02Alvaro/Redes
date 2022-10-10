@@ -28,22 +28,16 @@ void insertarDelante(Lista **cabeza, Jugador *jugador){
     *cabeza = elemento;
 }
 
-void borrar(Lista **cabeza, Jugador *jugador){
+void borrar(Lista **cabeza, int sd){
     Lista *aux=*cabeza;
-    if((*cabeza)->item == jugador){
+    if((*cabeza)->item->sd == sd){
         *cabeza = (*cabeza)->sig;
-        free(jugador);
         return;
     }
-    while(aux->sig->item != jugador){
+    while(aux->sig->item->sd != sd){
         aux=aux->sig;
     }
-
-    //TODO comprobar que funciona
-    Lista *elementoABorrar=aux->sig;
     aux->sig = aux->sig->sig;
-    free(jugador);
-    free(elementoABorrar);
 }
 
 int Nregistros(Lista *cabeza){
@@ -76,3 +70,38 @@ Jugador * buscarJugadorPartida(Lista  * cabeza){
     }
     return NULL;
 }
+void printLista(Lista * cabeza){
+    Lista * aux = cabeza;
+    while(aux != NULL){
+        printf("Jugador[sd:%d,estado:%d,nombre:%s,partida:%p]\n",
+            aux->item->sd,aux->item->estado,aux->item->nombre,aux->item->partida);
+        aux=aux->sig;
+    }
+}
+
+Jugador * nuevoJugaador(int sd,char *nombre,int estado){
+    Jugador* jugador = (Jugador*)malloc(sizeof(jugador));
+    jugador->sd = sd;
+    jugador->nombre = nombre;
+    jugador->estado = estado;
+    //jugador->partida =NULL;
+    return jugador;
+}
+
+
+/*
+int main(){
+    Lista * lista = NULL;
+    char msg[250];
+    Jugador* j1 = nuevoJugaador(1,"alvaro",0);
+    Jugador* j2 = nuevoJugaador(2,"mario",1);
+    Jugador* j3 = nuevoJugaador(3,"manu",2);
+    Jugador* j4 = nuevoJugaador(4,"jose",3);
+    insertarDetras(&lista,j1);
+    insertarDetras(&lista,j2);
+    insertarDetras(&lista,j3);
+    insertarDetras(&lista,j4);
+    borrar(&lista,4);
+    printLista(lista);
+}
+*/

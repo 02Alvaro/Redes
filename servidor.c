@@ -118,7 +118,7 @@ int main ( )
                                 send(listaJugadores->item->sd, buffer, sizeof(buffer),0);
                                 close(listaJugadores->item->sd);
                                 FD_CLR(listaJugadores->item->sd,&readfds);
-                                borrar(&listaJugadores,listaJugadores->item);
+                                borrar(&listaJugadores,listaJugadores->item->sd);
                             }
                             close(sd);
                             exit(-1);
@@ -132,12 +132,12 @@ int main ( )
                         if(recibidos > 0){
                             Jugador * jugadorActual = buscarJugador(listaJugadores,i);
                             int estadoJugador = jugadorActual->estado;
-                            printf("estado jugador<%d>->%d: mensaje:%s\n",i,estadoJugador,buffer);
+                            printf("jugador[sd:%d,estado:%d]->mensaje:[%s]\n",i,estadoJugador,buffer);
 
                             if(strcmp(buffer,"SALIR\n") == 0){
                                 //TODO
                                 printf("jugador<%d> saliendo",i);
-                                salirCliente(jugadorActual,&readfds,&numClientes,listaJugadores);
+                                salirCliente(jugadorActual,&readfds,&numClientes,&listaJugadores);
                             }
                             else{
                                 char* instruccion = strtok(buffer, " ");
@@ -225,7 +225,9 @@ int main ( )
                                     send(i, buffer, sizeof(buffer), 0);
 
                                 }else if(estadoJugador == 2){
-                                    if (strcmp(instruccion, "INICIAR-PARTIDA") == 0){
+                                    if(instruccion[strlen(instruccion)-1] == '\n')
+                                            instruccion[strlen(instruccion)-1] ='\0';
+                                    if (strcmp(instruccion,"INICIAR-PARTIDA") == 0){
                                         //TODO
                                         // Busca en orden de aparición en la lista el
                                         // primer jugador con estado 3
@@ -292,7 +294,7 @@ int main ( )
 
                         if(recibidos== 0){
                             printf("El socket %d, ha introducido ctrl+c\n", i);
-                                salirCliente(buscarJugador(listaJugadores,i),&readfds,&numClientes,listaJugadores);
+                                salirCliente(buscarJugador(listaJugadores,i),&readfds,&numClientes,&listaJugadores);
                         }
                     }
                 }
