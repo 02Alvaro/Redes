@@ -141,7 +141,6 @@ int main ( )
                             }
                             else{
                                 char* instruccion = strtok(buffer, " ");
-                                printf("Instruccion leida:%s\n",instruccion);
                                 if(estadoJugador == 0){
                                     if (strcmp(instruccion, "USUARIO") == 0){
                                         instruccion= strtok(NULL, " ");
@@ -149,7 +148,6 @@ int main ( )
                                             instruccion[strlen(instruccion)-1] ='\0';
                                         if(buscarUsuario(instruccion) == 1){
                                             jugadorActual->estado = 1;
-                                            printf("leido:%s\n",instruccion);
                                             strcpy(jugadorActual->nombre, instruccion);
                                             
                                             bzero(buffer,sizeof(buffer));
@@ -159,7 +157,6 @@ int main ( )
                                             bzero(buffer,sizeof(buffer));
                                             strcpy(buffer,"-Err. Usuario incorrecto\n");
                                         }
-                                        printf("entrando al USUARIO\n");
                                         
                                     } else if (strcmp(instruccion, "REGISTRO") == 0){
                                         int correcto = 0,error = 0, contador = 0;
@@ -199,7 +196,6 @@ int main ( )
                                         bzero(buffer,sizeof(buffer));
                                         strcpy(buffer,"-Err. Instrucción no válida\n");
                                     }
-                                    printf("<%d>:%s:",i,buffer);
                                     send(i, buffer, sizeof(buffer), 0);
 
                                 }else if(estadoJugador == 1){
@@ -233,6 +229,11 @@ int main ( )
                                         Jugador* contrincante = buscarJugadorPartida(listaJugadores);
                                         if (contrincante != NULL){
                                             bzero(buffer,sizeof(buffer));
+                                            strcpy(buffer,"+Ok, se incia una partida\n");
+                                            send(i, buffer, sizeof(buffer), 0);
+                                            send(contrincante->sd, buffer, sizeof(buffer), 0);
+
+                                            bzero(buffer,sizeof(buffer));
                                             inicializarPartida(jugadorActual, contrincante, buffer);
                                             
                                             send(i, buffer, sizeof(buffer), 0);
@@ -240,9 +241,12 @@ int main ( )
 
                                             bzero(buffer,sizeof(buffer));
                                             strcpy(buffer,"+Ok. Turno de partida\n");
-                                            send(i, buffer, sizeof(buffer), 0);
+                                            send(contrincante->sd, buffer, sizeof(buffer), 0);
                                         } else {
                                             jugadorActual->estado = 3;
+                                            bzero(buffer,sizeof(buffer));
+                                            strcpy(buffer,"+Ok. Esperando jugadores\n");
+                                            send(i, buffer, sizeof(buffer), 0);
                                         }
                                     } else {
                                         bzero(buffer,sizeof(buffer));
@@ -274,8 +278,9 @@ int main ( )
                                             if(res > 0){
                                                     partida->turno=partida->turno+1;
                                                      bzero(buffer,sizeof(buffer));
-                                                    strcpy(buffer,"-ok,ficha colocada\n");
+                                                    strcpy(buffer,"-Ok. Nuevo tablero\n");
                                                     send(i, buffer, sizeof(buffer), 0);
+                                                    //aqui deberia de enviar el tablero a ambos
                                                     strcpy(buffer,"-tu turno\n");
                                                     send(contrincante->sd,buffer,sizeof(buffer),0);
                                                     mostrarTablero(partida->tablero,buffer);
@@ -283,9 +288,9 @@ int main ( )
                                                     if(finPartida(partida->tablero,partida->turno,res,colum)==1){
 
                                                          bzero(buffer,sizeof(buffer));
-                                                    strcpy(buffer,"GANADOR jugador\n");
-                                                    send(i, buffer, sizeof(buffer), 0);
-                                                    send(contrincante->sd,buffer,sizeof(buffer),0);
+                                                        strcpy(buffer,"Ok. Jugador<nombre> ha ganado la partida\n");
+                                                        send(i, buffer, sizeof(buffer), 0);
+                                                        send(contrincante->sd,buffer,sizeof(buffer),0);
                                                     }
 
                                             }
@@ -296,7 +301,7 @@ int main ( )
                                             }
                                             else if(res == -2){
                                                 bzero(buffer,sizeof(buffer));
-                                                strcpy(buffer,"-Err. No cabe en esta columa\n");
+                                                strcpy(buffer,"-Err. Debe seleccionar otra columna que tenga alguna casilla disponible\n");
                                                 send(i, buffer, sizeof(buffer), 0);
                                             }
                                         }
