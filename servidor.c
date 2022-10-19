@@ -16,7 +16,8 @@
 #include "funciones.h"
 
 #define MSG_SIZE 250
-#define MAX_CLIENTS 50
+#define MAX_CLIENTS 30
+#define MAX_PARTIDAS 10
 
 void manejador(int signum);
 
@@ -35,8 +36,7 @@ int main ( )
     int numClientes = 0;
     int numPartidas = 0;
     int recibidos;
-    
-    //int arrayClientes[MAX_CLIENTS];
+
     Lista *listaJugadores = NULL;
 
   	sd = socket (AF_INET, SOCK_STREAM, 0);
@@ -123,6 +123,10 @@ int main ( )
                             close(sd);
                             exit(-1);
                             
+                        }else{
+                            for (int j = 0; j < numClientes; j++){
+                                send(listaJugadores->item->sd, buffer, sizeof(buffer),0);
+                            }
                         }
                     } 
                     else{ //mensaje de un cliente no nuevo
@@ -159,7 +163,7 @@ int main ( )
                                                 strcpy(buffer,"-Err. Usuario ya conectado\n");
                                             } else {
                                                 bzero(buffer,sizeof(buffer));
-                                                strcpy(buffer,"-Err. Falta argumentos\n");
+                                                strcpy(buffer,"-Err. Usuario no registrado\n");
                                             }
                                         } else {
                                             bzero(buffer,sizeof(buffer));
@@ -236,29 +240,29 @@ int main ( )
                                     if(instruccion[strlen(instruccion)-1] == '\n')
                                             instruccion[strlen(instruccion)-1] ='\0';
                                     if (strcmp(instruccion,"INICIAR-PARTIDA") == 0){
-                                        //TODO
-                                        // Busca en orden de aparición en la lista el
-                                        // primer jugador con estado 3
                                         Jugador* contrincante = buscarJugadorPartida(listaJugadores);
-                                        if (contrincante != NULL){
-                                            bzero(buffer,sizeof(buffer));
-                                            strcpy(buffer,"+Ok. Se incia una partida\n");
-                                            send(i, buffer, sizeof(buffer), 0);
-                                            send(contrincante->sd, buffer, sizeof(buffer), 0);
+                                        if(numPartidas < MAX_PARTIDAS){
+                                            if (contrincante != NULL){
+                                                numPartidas++;
+                                                bzero(buffer,sizeof(buffer));
+                                                strcpy(buffer,"+Ok. Empieza la partida.");
+                                                inicializarPartida(contrincante, jugadorActual, buffer);
+                                                
+                                                send(i, buffer, sizeof(buffer), 0);
+                                                send(contrincante->sd, buffer, sizeof(buffer), 0);
 
-                                            bzero(buffer,sizeof(buffer));
-                                            inicializarPartida(contrincante, jugadorActual, buffer);
-                                            
-                                            send(i, buffer, sizeof(buffer), 0);
-                                            send(contrincante->sd, buffer, sizeof(buffer), 0);
-
-                                            bzero(buffer,sizeof(buffer));
-                                            strcpy(buffer,"+Ok. Turno de partida\n");
-                                            send(contrincante->sd, buffer, sizeof(buffer), 0);
+                                                bzero(buffer,sizeof(buffer));
+                                                strcpy(buffer,"+Ok. Turno de partida\n");
+                                                send(contrincante->sd, buffer, sizeof(buffer), 0);
+                                            } else {
+                                                jugadorActual->estado = 3;
+                                                bzero(buffer,sizeof(buffer));
+                                                strcpy(buffer,"+Ok. Esperando jugadores\n");
+                                                send(i, buffer, sizeof(buffer), 0);
+                                            }
                                         } else {
-                                            jugadorActual->estado = 3;
                                             bzero(buffer,sizeof(buffer));
-                                            strcpy(buffer,"+Ok. Esperando jugadores\n");
+                                            strcpy(buffer,"-Err. Numero de partidas maxima\n");
                                             send(i, buffer, sizeof(buffer), 0);
                                         }
                                     } else {
@@ -306,6 +310,7 @@ int main ( )
                                                         send(contrincante->sd,buffer,sizeof(buffer),0);
                                                         jugadorActual->estado = 2;
                                                         contrincante->estado = 2;
+                                                        numPartidas--;
 
                                                     } else if(fin_partida == 2){
                                                         bzero(buffer,sizeof(buffer));
@@ -314,6 +319,7 @@ int main ( )
                                                         send(contrincante->sd,buffer,sizeof(buffer),0);
                                                         jugadorActual->estado = 2;
                                                         contrincante->estado = 2;
+                                                        numPartidas--;
                                                     } else {
                                                         bzero(buffer,sizeof(buffer));
                                                         strcpy(buffer,"+Ok. Turno de partida.");
@@ -342,7 +348,11 @@ int main ( )
 
                         if(recibidos== 0){
                             printf("El socket %d, ha introducido ctrl+c\n", i);
-                                salirCliente(buscarJugador(listaJugadores,i),&readfds,&numClientes,&listaJugadores);
+                            Jugador* aux =buscarJugador(listaJugadores,i);
+                            if(aux->estado==4){
+                                numPartidas--;
+                            }
+                            salirCliente(aux,&readfds,&numClientes,&listaJugadores);
                         }
                     }
                 }

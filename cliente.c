@@ -20,6 +20,7 @@ int main ( )
 	int sd;
 	struct sockaddr_in sockname;
 	char buffer[250];
+	char tablero[250];
 	socklen_t len_sockname;
     	fd_set readfds, auxfds;
     	int salida;
@@ -77,17 +78,26 @@ int main ( )
             
             bzero(buffer,sizeof(buffer));
             recv(sd,buffer,sizeof(buffer),0);
-					for(int i=0;i<sizeof(buffer);i++){
-						if(buffer[i]==','){
-							buffer[i]='|';
+			if(strstr(buffer,"1,2,3,4,5,6,7;") != NULL){
+				strcpy(tablero,strstr(buffer,"1,2,3,4,5,6,7;"));
+				for(int i=0;i<sizeof(tablero);i++){
+					if(tablero[i]==','){
+						tablero[i]='|';
 
-						}
-						else if(buffer[i]==';'){
-							buffer[i]='\n';
-						}
 					}
+					else if(tablero[i]==';'){
+						tablero[i]='\n';
+					}
+				}
+				if (strstr(buffer,"Empieza"))
+					printf("+Ok. Empieza la partida.\n%s",tablero);
+				else {
+					printf("+Ok. Nuevo tablero.\n%s",tablero);
+				}
+			}else{
+            	printf("\n%s",buffer);
+			}
 				
-            printf("\n%s\n",buffer);
             
             if(strcmp(buffer,"Demasiados clientes conectados\n") == 0)
                 fin =1;
