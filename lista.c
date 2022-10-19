@@ -2,6 +2,7 @@
 #include "estructuras.h"
 #include <stdio.h>
 #include <stdlib.h>   
+#include <string.h>
 
 Lista *nuevoElemento(){
     return ( Lista*)malloc(sizeof(Lista));
@@ -60,6 +61,18 @@ Jugador * buscarJugador(Lista *cabeza, int sd){
     }
     return NULL;
 }
+int buscarJugadorPorNombre(Lista *cabeza, char * nombre){
+    Lista * aux=cabeza;
+    while(aux != NULL){
+        if(strcmp(aux->item->nombre,nombre) == 0){
+            return 1;
+        }
+        aux=aux->sig;
+    }
+    return 0;
+}
+
+
 Jugador * buscarJugadorPartida(Lista  * cabeza){
     Lista * aux=cabeza;
     while(aux != NULL){

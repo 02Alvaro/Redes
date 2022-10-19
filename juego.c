@@ -42,7 +42,7 @@ void inicializarPartida(Jugador* j1, Jugador* j2, char* msg){
     
     partida->jugador2 = j2;
     partida->jugador1 = j1;
-    partida->turno = 0;
+    partida->turno = 1;
 
 }
 
@@ -63,7 +63,7 @@ int actualizarTablero(char tablero[][7], int colum, int turno){
 
 int finPartida(char tablero[][7],int turno,int fila,int columna){
     if(turno == MAX_TURNO){
-        return 1;
+        return 2;
     }
     char ficha = (turno %2 == 0) ? 'x' : 'o';
     int x = fila, y = columna;
