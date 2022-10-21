@@ -19,9 +19,6 @@
 #define MAX_CLIENTS 30
 #define MAX_PARTIDAS 10
 
-void manejador(int signum);
-
-
 int main ( )
 {
     int sd, new_sd, on;
@@ -94,6 +91,7 @@ int main ( )
                                 Jugador* jugador = nuevoJugador(new_sd);
                                 insertarDetras(&listaJugadores, jugador);
                                 numClientes++;
+                                printf("Nuevo jugador conectado: %d/%d\n",new_sd,numClientes);
                                 FD_SET(new_sd,&readfds);
                             
                                 strcpy(buffer, "+Ok. Usuario conectado\n");
@@ -110,7 +108,6 @@ int main ( )
                     else if (i == 0){ //escritura del servidor
                         bzero(buffer, sizeof(buffer));
                         fgets(buffer, sizeof(buffer),stdin);
-                        
                         if(strcmp(buffer,"SALIR\n") == 0){
                             for (int j = 0; j < numClientes; j++){
                                 bzero(buffer, sizeof(buffer));
@@ -133,9 +130,11 @@ int main ( )
                         bzero(buffer,sizeof(buffer));
                         recibidos = recv(i,buffer,sizeof(buffer),0);
 
-                        if(recibidos > 0){
+                        if(recibidos > 0 ){
                             Jugador * jugadorActual = buscarJugador(listaJugadores,i);
                             int estadoJugador = jugadorActual->estado;
+                            if(buffer[strlen(buffer)-1] == '\n')
+                                buffer[strlen(buffer)-1] ='\0';
                             printf("jugador[sd:%d,estado:%d]->mensaje:[%s]\n",i,estadoJugador,buffer);
 
                             if(strcmp(buffer,"SALIR\n") == 0){
@@ -145,11 +144,14 @@ int main ( )
                             }
                             else{
                                 char* instruccion = strtok(buffer, " ");
-                                if(estadoJugador == 0){
+                                if(strlen(buffer) == 0){
+                                    bzero(buffer,sizeof(buffer));
+                                    strcpy(buffer,"-Err. Instrucción no válida\n");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                }
+                                else if(estadoJugador == 0){
                                     if (strcmp(instruccion, "USUARIO") == 0){
                                         if((instruccion = strtok(NULL, " ")) != NULL){
-                                            if(instruccion[strlen(instruccion)-1] == '\n')
-                                                instruccion[strlen(instruccion)-1] ='\0';
                                             if(buscarUsuario(instruccion) == 1 && 
                                             buscarJugadorPorNombre(listaJugadores, instruccion) == 0){
                                                 jugadorActual->estado = 1;
@@ -163,7 +165,7 @@ int main ( )
                                                 strcpy(buffer,"-Err. Usuario ya conectado\n");
                                             } else {
                                                 bzero(buffer,sizeof(buffer));
-                                                strcpy(buffer,"-Err. Usuario no registrado\n");
+                                                strcpy(buffer,"-Err. Usuario incorrecto\n");
                                             }
                                         } else {
                                             bzero(buffer,sizeof(buffer));
@@ -218,16 +220,18 @@ int main ( )
                                 }else if(estadoJugador == 1){
                                     if (strcmp(instruccion, "PASSWORD") == 0){
                                         //TODO
-                                        instruccion =  strtok(NULL, "\n");
-                                        if(instruccion[strlen(instruccion)-1] == '\n')
-                                            instruccion[strlen(instruccion)-1] ='\0';
-                                        if( comprobarCont(jugadorActual->nombre,instruccion) == 1 ){
-                                            jugadorActual->estado = 2;
+                                        if((instruccion = strtok(NULL, "\0")) != NULL){
+                                            if( comprobarCont(jugadorActual->nombre, instruccion) == 1 ){
+                                                jugadorActual->estado = 2;
+                                                bzero(buffer,sizeof(buffer));
+                                                strcpy(buffer,"+Ok. Usuario validado\n");
+                                            }else{
+                                                bzero(buffer,sizeof(buffer));
+                                                strcpy(buffer,"-Err. Error en la validación\n");
+                                            }
+                                        } else {
                                             bzero(buffer,sizeof(buffer));
-                                            strcpy(buffer,"+Ok. Usuario validado\n");
-                                        }else{
-                                            bzero(buffer,sizeof(buffer));
-                                            strcpy(buffer,"-Err. Error en la validación\n");
+                                            strcpy(buffer,"-Err. Instrucción no válida\n");
                                         }
                                     } else {
                                         bzero(buffer,sizeof(buffer));
@@ -237,8 +241,6 @@ int main ( )
                                     send(i, buffer, sizeof(buffer), 0);
 
                                 }else if(estadoJugador == 2){
-                                    if(instruccion[strlen(instruccion)-1] == '\n')
-                                            instruccion[strlen(instruccion)-1] ='\0';
                                     if (strcmp(instruccion,"INICIAR-PARTIDA") == 0){
                                         Jugador* contrincante = buscarJugadorPartida(listaJugadores);
                                         if(numPartidas < MAX_PARTIDAS){
@@ -270,32 +272,28 @@ int main ( )
                                         strcpy(buffer,"-Err. Instrucción no válida\n");
                                         send(i, buffer, sizeof(buffer), 0);
                                     }
-                                }else if(estadoJugador == 4){
+                                } else if (estadoJugador == 3){
+                                    bzero(buffer,sizeof(buffer));
+                                    strcpy(buffer,"-Err. Instrucción no válida\n");
+                                    send(i, buffer, sizeof(buffer), 0);
+                                
+                                } else if(estadoJugador == 4){
                                     Partida* partida = jugadorActual->partida;
                                     Jugador* contrincante;
 
                                     contrincante = (partida->turno % 2 == 0) 
                                         ? partida->jugador1 : partida->jugador2;
-                                  
-                                    if(instruccion[strlen(instruccion)-1] == '\n')
-                                            instruccion[strlen(instruccion)-1] ='\0';
 
                                     if (strcmp(instruccion, "COLOCAR-FICHA") == 0){
                                         if(jugadorActual->sd == contrincante->sd){
                                             bzero(buffer,sizeof(buffer));
-                                            strcpy(buffer,"-Err. No es tu turno\n");
+                                            strcpy(buffer,"-Err. Debe esperar su turno\n");
                                             send(i, buffer, sizeof(buffer), 0);
                                         }else{
-                                            instruccion = strtok(NULL,"\n");
-
-                                            if(instruccion[strlen(instruccion)-1] == '\n')
-                                                instruccion[strlen(instruccion)-1] ='\0';
-                                            
-                                            int colum=strtol(instruccion,NULL,10) - 1;
-                                            int res = actualizarTablero(partida->tablero,colum,partida->turno);
-                                            if(res > 0){
-                                                    partida->turno=partida->turno+1;
- 
+                                            if ((instruccion = strtok(NULL, "\0"))!= NULL){
+                                                int colum=strtol(instruccion,NULL,10) - 1;
+                                                int res = actualizarTablero(partida->tablero,colum,partida->turno);
+                                                if(res > 0){
                                                     bzero(buffer,sizeof(buffer));
                                                     strcpy(buffer,"+Ok. Nuevo tablero.");
                                                     mostrarTablero(partida->tablero,buffer);
@@ -303,6 +301,7 @@ int main ( )
                                                     send(contrincante->sd,buffer,sizeof(buffer),0);
 
                                                     int fin_partida = finPartida(partida->tablero,partida->turno,res,colum);
+                                                   
                                                     if(fin_partida == 1){
                                                         bzero(buffer,sizeof(buffer));
                                                         sprintf(buffer,"+Ok. Jugador %s ha ganado la partida\n", jugadorActual->nombre);
@@ -321,26 +320,32 @@ int main ( )
                                                         contrincante->estado = 2;
                                                         numPartidas--;
                                                     } else {
+                                                        partida->turno=partida->turno+1;
                                                         bzero(buffer,sizeof(buffer));
                                                         strcpy(buffer,"+Ok. Turno de partida.");
                                                         send(contrincante->sd,buffer,sizeof(buffer),0);
                                                     }
-                                            }
-                                            else if(res == -1 ){
+                                                }
+                                                else if(res == -1 ){
+                                                    bzero(buffer,sizeof(buffer));
+                                                    strcpy(buffer,"-Err. ficha fuera de limite\n");
+                                                send(i, buffer, sizeof(buffer), 0);
+                                                }
+                                                else if(res == -2){
+                                                    bzero(buffer,sizeof(buffer));
+                                                    strcpy(buffer,"-Err. Debe seleccionar otra columna que tenga alguna casilla disponible\n");
+                                                    send(i, buffer, sizeof(buffer), 0);
+                                                }
+                                            } else {
                                                 bzero(buffer,sizeof(buffer));
-                                                strcpy(buffer,"-Err. ficha fuera de limite\n");
-                                             send(i, buffer, sizeof(buffer), 0);
-                                            }
-                                            else if(res == -2){
-                                                bzero(buffer,sizeof(buffer));
-                                                strcpy(buffer,"-Err. Debe seleccionar otra columna que tenga alguna casilla disponible\n");
+                                                strcpy(buffer,"-Err. Indique casilla\n");
                                                 send(i, buffer, sizeof(buffer), 0);
                                             }
                                         }
-                                            
                                     } else {
                                         bzero(buffer,sizeof(buffer));
                                         strcpy(buffer,"-Err. Instrucción no válida\n");
+                                        send(i, buffer, sizeof(buffer), 0);
                                     }
                                 }
                             }
@@ -363,11 +368,4 @@ int main ( )
 	close(sd);
 	return 0;
 	
-}
-
-void manejador (int signum){
-    printf("\nSe ha recibido la señal sigint\n");
-    signal(SIGINT,manejador);
-    
-    //Implementar lo que se desee realizar cuando ocurra la excepción de ctrl+c en el servidor
 }

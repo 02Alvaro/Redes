@@ -7,7 +7,7 @@
 
 void mostrarTablero(char tablero[][7],char * msg){
     char  aux;
-	for(int i = 0; i < 7; i++ ){
+	for(int i = 1; i < 7; i++ ){
 		for(int j = 0; j < 7; j++ ){
             aux = tablero[i][j];
             if (j != 0)
@@ -62,7 +62,7 @@ int actualizarTablero(char tablero[][7], int colum, int turno){
 }
 
 int finPartida(char tablero[][7],int turno,int fila,int columna){
-    if(turno == MAX_TURNO){
+    if(turno+1 == MAX_TURNO){
         return 2;
     }
     char ficha = (turno %2 == 0) ? 'x' : 'o';
@@ -115,7 +115,7 @@ int finPartida(char tablero[][7],int turno,int fila,int columna){
         x--;
         y--;
     }
-    while(x < 6 && y > 6 && tablero[x+1][y+1] == ficha ){
+    while(x < 6 && y < 6 && tablero[x+1][y+1] == ficha ){
 		contador++;
 		x++;
 		y++;
@@ -126,25 +126,34 @@ int finPartida(char tablero[][7],int turno,int fila,int columna){
   
     return 0;
 }
-
-
-
-
 /*
+
+void printtablero(char tablero[][7],char * msg){
+    printf("|");
+    for(int i = 0; i < 7; i++ ){
+        for(int j = 0; j < 7; j++ ){
+           printf("%c|",tablero[i][j]);
+        }
+        printf("\n|");
+    }
+}
+
+
     int  main(){
         char tablero[7][7]={{'1','2','3','4','5','6','7'},
                             {'-','-','-','-','-','-','-'},
                             {'-','-','-','-','-','-','-'},
-                            {'-','-','-','-','-','-','-'},
-                            {'-','-','-','-','-','-','-'},
-                            {'-','-','-','-','-','-','-'},
-                            {'-','-','-','-','-','-','-'}};
-        int turno =0;
+                            {'-','x','-','x','-','-','-'},
+                            {'-','-','x','-','-','-','x'},
+                            {'-','x','-','-','-','-','x'},
+                            {'-','-','x','x','-','-','x'}};
+        int turno =1;
         int fila;
         int posicion;
         char* msg=(char*)malloc(sizeof(char)*250);
-        mostrarTablero(tablero,msg);
-        printf("%s",msg); 
+        printtablero(tablero,msg);
+        printf("%s",msg);
+        printf("\n%c",tablero[6][0]); 
         do{
             turno++;
             posicion=0;
@@ -154,7 +163,7 @@ int finPartida(char tablero[][7],int turno,int fila,int columna){
                 posicion--;
                 fila=actualizarTablero(tablero,posicion,turno);
             }while(fila<0);
-            mostrarTablero(tablero,msg);
+            printtablero(tablero,msg);
             printf("%s",msg); 
             printf("\n\n");
         }while(finPartida(tablero,turno,fila,posicion) == 0);

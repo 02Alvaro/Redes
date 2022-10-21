@@ -25,7 +25,6 @@ int main ( )
     	fd_set readfds, auxfds;
     	int salida;
     	int fin = 0;
-	
     
 	/* --------------------------------------------------
 		Se abre el socket 
@@ -78,28 +77,42 @@ int main ( )
             
             bzero(buffer,sizeof(buffer));
             recv(sd,buffer,sizeof(buffer),0);
-			if(strstr(buffer,"1,2,3,4,5,6,7;") != NULL){
-				strcpy(tablero,strstr(buffer,"1,2,3,4,5,6,7;"));
+			//printf("%s",buffer);
+			if(strstr(buffer,"+Ok. Empieza la partida.") != NULL){
+				strcpy(tablero,buffer+24);
 				for(int i=0;i<sizeof(tablero);i++){
 					if(tablero[i]==','){
 						tablero[i]='|';
-
 					}
 					else if(tablero[i]==';'){
 						tablero[i]='\n';
 					}
+					else if(tablero[i]=='-'){
+						tablero[i]=' ';
+					}
 				}
-				if (strstr(buffer,"Empieza"))
-					printf("+Ok. Empieza la partida.\n%s",tablero);
-				else {
-					printf("+Ok. Nuevo tablero.\n%s",tablero);
+				printf("+Ok. Empieza la partida.\n1|2|3|4|5|6|7\n%s",tablero);
+			}
+			else if(strstr(buffer,"+Ok. Nuevo tablero.") != NULL){
+				strcpy(tablero,buffer+19);
+				for(int i=0;i<sizeof(tablero);i++){
+					if(tablero[i]==','){
+						tablero[i]='|';
+					}
+					else if(tablero[i]==';'){
+						tablero[i]='\n';
+					}
+					else if(tablero[i]=='-'){
+						tablero[i]=' ';
+					}
 				}
+				printf("+Ok. Nuevo tablero.\n1|2|3|4|5|6|7\n%s",tablero);
 			}else{
-            	printf("\n%s",buffer);
+            	printf("\n%s\n",buffer);
 			}
 				
             
-            if(strcmp(buffer,"Demasiados clientes conectados\n") == 0)
+            if(strcmp(buffer,"-Err. Demasiados usuarios conectados\n") == 0)
                 fin =1;
             
             if(strcmp(buffer,"Desconexión servidor\n") == 0)

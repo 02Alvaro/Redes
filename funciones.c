@@ -29,7 +29,7 @@ void salirCliente(Jugador * jugador, fd_set * readfds, int * numClientes, Lista 
         }
 
         bzero(buffer,sizeof(buffer));
-        strcpy(buffer,"-Inf. Su adversario ha salido. Use INICIAR-PARTIDA para volver a jugar\n");
+        strcpy(buffer,"+Ok. Tu oponente ha salido de la partida\n");
         send(contrincante->sd, buffer, sizeof(buffer), 0);
 
         contrincante->estado = 2;
@@ -67,7 +67,7 @@ int buscarUsuario(char * usuario){
 int comprobarCont(char * nombre,char * psd){
     FILE * f;
     char str1[250] = "default";
-    char *str2 ;
+    char* str2 ;
 
 	if((f=fopen("usuarios.txt","r"))==NULL)
         printf("Error en la opertura del fichero\n");
@@ -75,18 +75,18 @@ int comprobarCont(char * nombre,char * psd){
     while(fgets(str1,250,f)){
         str2 = strtok(str1,",");
         if(strcmp(str2,nombre)==0){
-                str2 = strtok(NULL,"\n");
-                if(strcmp(str2,psd)==0){
-                    fclose(f);    
-                    return 1;
-                }
-
-        }else{
-            fclose(f);    
-            return 1;
+            str2 = strtok(NULL,"\n");
+            if(strcmp(str2,psd)==0){
+                fclose(f);    
+                return 1;
+            } else {
+                fclose(f);    
+                return 0;
+            }
         }
     }
     fclose(f);
+    return 0;
 }
 
 void ingresarUsuario(char * nombre,char* psd ){
